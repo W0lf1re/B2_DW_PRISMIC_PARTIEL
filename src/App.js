@@ -33,16 +33,16 @@ function App() {
     }
   })
 
-  const inStockIngredients = ingredientsData?.filter((ingredient) => ingredient.isAvailable).map(ingredientId => ingredientId.uid)
-  const inStockDrinks = drinksData?.filter((drink) => drink.isAvailable).map(drinkId => drinkId.uid)
+  // const inStockIngredients = ingredientsData?.filter((ingredient) => ingredient.isAvailable).map(ingredientId => ingredientId.uid)
+  // const inStockDrinks = drinksData?.filter((drink) => drink.isAvailable).map(drinkId => drinkId.uid)
 
-  const isAvailable = inStockIngredients && inStockDrinks && recipesData?.filter((recipe) => {
-    const recipeIngredients = recipe.ingredients?.map((ingredient) => ingredient.uid)
-    const recipeDrinks = recipe.drinks?.map((drink) => drink.uid)
-    return recipeIngredients.every((ingredient) => inStockIngredients.includes(ingredient)) && recipeDrinks.every((drink) => inStockDrinks.includes(drink))
-  })
+  // const isAvailable = inStockIngredients && inStockDrinks && recipesData?.every((recipe) => {
+  //   const recipeIngredients = recipe.ingredients?.map((ingredient) => ingredient.uid)
+  //   const recipeDrinks = recipe.drinks?.map((drink) => drink.uid)
+  //   return recipeIngredients.every((ingredient) => inStockIngredients.includes(ingredient)) && recipeDrinks.every((drink) => inStockDrinks.includes(drink))
+  // })
 
-  console.log("isAvailable", isAvailable);
+  // console.log("isAvailable", isAvailable);
 
   return (
     <div className="App">
@@ -52,7 +52,7 @@ function App() {
         {recipesData?.map((recipe) => {
           return (
             <div className='recipe' key={recipe.uid}>
-              {isAvailable ? <p>Disponible</p> : <p>Indisponible</p>}
+              {/* {isAvailable ? <p>Disponible</p> : <p>Indisponible</p>} */}
               <h1 className='recipeName'>{recipe.name}</h1>
               <img className='recipeImg' src={recipe.image} alt={recipe.name} />
               <h2>Ingrédients :</h2>
