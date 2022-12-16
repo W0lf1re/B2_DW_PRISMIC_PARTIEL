@@ -1,17 +1,10 @@
 import { useAllPrismicDocumentsByType } from '@prismicio/react';
-import { useEffect } from 'react';
+import Header from './components/Header';
 
 function App() {
-  const [recipes] = useAllPrismicDocumentsByType('recipes')
   const [ingredients] = useAllPrismicDocumentsByType('ingredients')
   const [drinks] = useAllPrismicDocumentsByType('drinks')
-
-  const recipesData = recipes && recipes.map((recipe) => {
-    return {
-      uid: recipe.uid,
-      name: recipe.data.name[0].text,
-    }
-  })
+  const [recipes] = useAllPrismicDocumentsByType('recipes')
 
   const ingredientsData = ingredients && ingredients.map((ingredient) => {
     return {
@@ -29,71 +22,60 @@ function App() {
     }
   })
 
-  console.log(recipes?.map((recipe) => {
-    return recipe.data
-  }))
+  const recipesData = recipes && recipes.map((recipe) => {
+    return {
+      uid: recipe.uid,
+      name: recipe.data.name[0].text,
+      image: recipe.data.image.url,
+      price: recipe.data.price[0].text,
+      ingredients: ingredientsData?.filter((ingredient) => recipe.data.ingredients.map((ingredient) => ingredient.ingredient.uid).includes(ingredient.uid)),
+      drinks: drinksData?.filter((drink) => recipe.data.drinks.map((drink) => drink.drinks.uid).includes(drink.uid))
+    }
+  })
 
   const inStockIngredients = ingredientsData?.filter((ingredient) => ingredient.isAvailable).map(ingredientId => ingredientId.uid)
+  const inStockDrinks = drinksData?.filter((drink) => drink.isAvailable).map(drinkId => drinkId.uid)
 
-  // const unmodeledIngredients = recipes?.map((recipe) => {
-  //   return recipe.data.ingredients.map((ingredient) => {
-  //     return ingredient
-  //   })
-  // })
-
-  const unmodeledIngredients = recipes?.map((recipe) => {
-    return recipe.data.ingredients.map((ingredient) => {
-      return ingredient.ingredient.uid
-    })
+  const isAvailable = inStockIngredients && inStockDrinks && recipesData?.filter((recipe) => {
+    const recipeIngredients = recipe.ingredients?.map((ingredient) => ingredient.uid)
+    const recipeDrinks = recipe.drinks?.map((drink) => drink.uid)
+    return recipeIngredients.every((ingredient) => inStockIngredients.includes(ingredient)) && recipeDrinks.every((drink) => inStockDrinks.includes(drink))
   })
 
-  const test = () => {
-    if (inStockIngredients?.includes(unmodeledIngredients)) {
-      console.log("ta dispo");
-    } else {
-      console.log("ta pas dispo");
-    }
-  }
-
-  console.log("mon map", unmodeledIngredients?.map((ingredient) => {
-    return ingredient
-  })
-  )
-
-  console.log("unmodelé", unmodeledIngredients)
-
-  console.log("en stock", inStockIngredients)
-
-  useEffect(() => {
-    test()
-  }, [])
+  console.log("isAvailable", isAvailable);
 
   return (
     <div className="App">
-      <h1>Recipes</h1>
-      {/* {
-        drinksData?.filter(drink => drink.isAvailable).map((drink) => {
+      <Header />
+      <h1 className='title'>Nos recettes</h1>
+      <div className='recipes'>
+        {recipesData?.map((recipe) => {
           return (
-            <div key={drink.uid}>
-              <h2>{drink.name}</h2>
+            <div className='recipe' key={recipe.uid}>
+              {isAvailable ? <p>Disponible</p> : <p>Indisponible</p>}
+              <h1 className='recipeName'>{recipe.name}</h1>
+              <img className='recipeImg' src={recipe.image} alt={recipe.name} />
+              <h2>Ingrédients :</h2>
+              <ul>
+                {recipe.ingredients?.map((ingredient) => {
+                  return (
+                    <li key={ingredient.uid}>{ingredient.name}</li>
+                  )
+                })}
+              </ul>
+              <h2>Boisson recommandée :</h2>
+              <ul>
+                {recipe.drinks?.map((drink) => {
+                  return (
+                    <li key={drink.uid}>{drink.name}</li>
+                  )
+                })}
+              </ul>
+              <h1>Prix : {recipe.price}€</h1>
             </div>
           )
-        })
-      } */}
-      {recipesData?.map((recipe) => {
-        return (
-          <div key={recipe.uid}>
-            <h2>{recipe.name}</h2>
-            {ingredientsData?.filter((ingredient => ingredient.isAvailable)).map((ingredient) => {
-              return (
-                <div key={ingredient.uid}>
-                  <h3>{ingredient.name}</h3>
-                </div>
-              )
-            })}
-          </div>
-        )
-      })}
+        })}
+      </div>
     </div>
   )
 }
